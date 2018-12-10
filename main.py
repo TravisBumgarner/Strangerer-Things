@@ -5,14 +5,20 @@ import time
 
 ADDRESSABLE_LEDS = 50
 OFF = (0,0,0)
-ON = (255,255,255)
+WHITE = (255,255,255)
+RED = (0, 255, 0)
 
 pixels = neopixel.NeoPixel(board.D12, ADDRESSABLE_LEDS) 
 
 
 def sanitize_message(text):
-    # Remove bad chars
-    pass
+    sanitized_text = ''
+    
+    for letter in text.lower():
+        if ord(letter) < ord('a') or ord(letter) > ord('z'):
+            continue
+        sanitized_text += letter
+    return sanitized_text
 
 
 def random_color():
@@ -22,9 +28,9 @@ def random_color():
 
 def render_message(text):
     letter_offset = ord('a')
-    for letter in text.lower():
+    for letter in text:
         index = ord(letter) - letter_offset
-        pixels[index] = ON
+        pixels[index] = WHITE
         time.sleep(0.25)
         pixels[index] = OFF
         time.sleep(0.25 / 2)
@@ -37,16 +43,26 @@ def all_off():
         
 def all_on(color=None):
     if color is None:
-        color = ON
+        color = WHITE
     for led in range(ADDRESSABLE_LEDS):
-        pixels[led] = ON
+        print(led)
+        pixels[led] = color
 
 
 def main():
-    while True:
-        all_off()
-        render_message('ace')
-        
+    try:
+        while True:
+            message = 'CART!'
+            sanitized_message = sanitize_message(message)
+            render_message(sanitized_message)
+    except:
+        #print(e)
+        for i in range(3):
+            all_on(color=RED)
+            time.sleep(0.25)
+            all_off()
+            time.sleep(0.25)    
+        raise
         
 
 
