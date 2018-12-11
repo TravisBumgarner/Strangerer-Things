@@ -31,7 +31,7 @@ SPACE = ord(' ')
 
 ###### /CONSTANTS HERE #####
 
-pixels = neopixel.NeoPixel(board.D12, ADDRESSABLE_LEDS) 
+pixels = neopixel.NeoPixel(board.D12, ADDRESSABLE_LEDS, pixel_order=neopixel.RGB) 
 
 
 def sanitize_message(text):
@@ -96,14 +96,13 @@ def adjust_brightness(rgb, brightness=1):
 
 def idle_mode():
     # This function needs help
-    rand_r = random.randint(0,255)
-    rand_b = random.randint(0,255)
-    rand_g = random.randint(0,255)
-    print(rand_r, rand_b, rand_g)
     lights = [random.randint(0,4) for i in range(ADDRESSABLE_LEDS)]
-    indices = sorted([i for i in range(26)], key=lambda *args: random.random())
+    indices = sorted([i for i in range(ADDRESSABLE_LEDS)], key=lambda *args: random.random())
     for i in indices:
-        pixels[i] = (int(rand_r * lights[i] / 4), int(rand_b* lights[i] / 4), int(rand_g* lights[i] / 4))
+        rand_r = random.randint(0,255)
+        rand_b = random.randint(0,255)
+        rand_g = random.randint(0,255)
+        pixels[i] = (int(rand_r  * lights[i] / 4), int(rand_b * lights[i] / 4), int(rand_g * lights[i] / 4))
 
 def error_mode():
     for i in range(3):
@@ -111,6 +110,7 @@ def error_mode():
         time.sleep(0.25)
         all_off()
         time.sleep(0.25)    
+
 
 def prompt_user_input():
     try:
@@ -128,10 +128,10 @@ def main():
             all_off()
             sanitized_message = sanitize_message(message)
             for _ in range(TIMES_TO_DISPLAY_MESSAGE):
-                print('printing msg')
                 render_message(sanitized_message)
                 time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
             message = None
+        
         else:
             try:
                 while True:
@@ -143,8 +143,12 @@ def main():
 
 
 if __name__ == "__main__":
-##    try:
+    try:
         main()
     
-##    except :
-##        error_mode()        
+    except Exception as e:
+        print(e)
+        error_mode()
+    
+    finally:
+        all_off()
