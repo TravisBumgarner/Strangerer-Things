@@ -14,6 +14,18 @@ OFF = (0,0,0)
 PS_ORANGE = (249, 104, 22)
 PS_PINK = (232,10,137)
 
+
+# Themes
+CHRISTMAS_THEME = "CHRISTMAS_MODE"
+CHRISTMAS_COLORS = [WHITE, GREEN, RED]
+
+PS_THEME = "PS_THEME"
+PS_COLORS = [PS_ORANGE, PS_PINK]
+
+RANDOM_THEME = "RANDOM_THEME"
+
+SELECTED_THEME = CHRISTMAS_THEME
+
 # TIMING (ALL IN SECONDS) & LOOPING 
 TIMES_TO_DISPLAY_MESSAGE = 3
 PAUSE_BETWEEN_MESSAGE_REPEATS = 0.5
@@ -43,17 +55,31 @@ def sanitize_message(text):
     return sanitized_text
 
 
-def random_color():
-    # gen random tuple for a color
-    pass
+def get_pixel_color(index=None):
+    # index % len(possible_them_colors) gives us the index to pick
+    color = None
+    if SELECTED_THEME == CHRISTMAS_THEME:
+        print(index % len(CHRISTMAS_COLORS))
+        color = CHRISTMAS_COLORS[index % len(CHRISTMAS_COLORS)]
+        
+    elif SELECTED_THEME == PS_THEME:
+        color = PS_COLORS[index % len(PS_COLORS)]
+        
+    elif SELECTED_THEME == RANDOM_THEME:
+        r = random.randint(0,255)
+        b = random.randint(0,255)
+        g = random.randint(0,255)
+        color = (r,g,b)
+    print(color)
+    return color
+
 
 def render_word(word):
     letter_offset = ord('a')
       
-    for letter in word:
+    for letter_index, letter in enumerate(word):
         index = ord(letter) - letter_offset
-        even = index % 2
-        pixels[index] = PS_ORANGE if even else PS_PINK 
+        pixels[index] = get_pixel_color(letter_index) 
         time.sleep(PAUSE_LETTER_ON)
         pixels[index] = OFF
         time.sleep(PAUSE_LETTER_OFF)
@@ -99,10 +125,9 @@ def idle_mode():
     lights = [random.randint(0,4) for i in range(ADDRESSABLE_LEDS)]
     indices = sorted([i for i in range(ADDRESSABLE_LEDS)], key=lambda *args: random.random())
     for i in indices:
-        rand_r = random.randint(0,255)
-        rand_b = random.randint(0,255)
-        rand_g = random.randint(0,255)
-        pixels[i] = (int(rand_r  * lights[i] / 4), int(rand_b * lights[i] / 4), int(rand_g * lights[i] / 4))
+        r,b,g = get_pixel_color(i)
+        pixels[i] = (int(r  * lights[i] / 4), int(b * lights[i] / 4), int(g * lights[i] / 4))
+
 
 def error_mode():
     for i in range(3):
