@@ -1,5 +1,4 @@
 *.pyc
-
 node_modules/
 .env
-slack_express/src/config.js
+config.js
