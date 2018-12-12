@@ -1,0 +1,27 @@
+{
+  "name": "continuous-learning-mk2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "NODE_ENV=development nodemon -r esm index.js",
+    "start:prod": "NODE_ENV=production nodemon -r esm index.js",
+    "test": "mocha -r esm \"./src/**/*.spec.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TravisBumgarner/strangerer-things.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "esm": "^3.0.84",
+    "express": "^4.16.4",
+    "knex": "^0.16.2",
+    "nodemon": "^1.18.8",
+    "pg": "^7.7.1",
+    "qs": "^6.6.0"
+  }
+}
