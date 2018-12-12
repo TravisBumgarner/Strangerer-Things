@@ -25,7 +25,7 @@ def auth_ok():
 
 @app.route('/ok', methods=['GET', 'POST'])
 def ok(): 
-    print(request.form['team_domain'])
+    # print(request.form['team_domain'])
     return jsonify(
         status=200,
         text='Ok',
