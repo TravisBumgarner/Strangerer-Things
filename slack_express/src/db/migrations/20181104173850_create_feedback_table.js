@@ -1,4 +1,4 @@
-const TABLE_NAME = "feedback"
+const TABLE_NAME = "message"
 
 exports.up = function(knex, Promise) {
     return knex.schema.createTable(TABLE_NAME, table => {

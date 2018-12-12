@@ -1,11 +1,5 @@
 const config = {
-    whiteListUrls: [],
-    db: {
-        host: "",
-        user: "",
-        password: "",
-        database: ""
-    },
+    whiteListUrls: ['/ok','/auth-ok', '/message'],
     slack: {
         team: "",
         client_id: "",

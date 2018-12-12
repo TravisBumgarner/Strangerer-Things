@@ -11,7 +11,8 @@ app.use(bodyParser.json())
 
 app.use(middleware.validateSlackRequest)
 
-app.post("/", async (request, response, next) => {
+app.post("/message", async (request, response, next) => {
+    routes.message(request.body)
     response.send('ok')
 })
 
@@ -21,10 +22,5 @@ app.get("/auth", async (request, response, next) => {
 })
 
 app.get("/ok", (request, response, next) => response.send("Service is running"))
-
-if (process.env.NODE_ENV === "production") {
-    // The error handler must be before any other error middleware
-    app.use(Sentry.Handlers.errorHandler())
-}
 
 export default app

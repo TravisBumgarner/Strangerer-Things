@@ -1,16 +1,10 @@
-const config = require("../config")
-
-const { host, user, password, database } = config.db
+const path = require('path')
 
 module.exports = {
     development: {
-        client: "pg",
-        version: "7.2",
+        client: "sqlite3",
         connection: {
-            host,
-            user,
-            password,
-            database
+            filename: path.resolve(__dirname, './db.sqlite')
         },
         migrations: {
             directory: "./migrations"
