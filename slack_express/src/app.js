@@ -12,8 +12,8 @@ app.use(bodyParser.json())
 app.use(middleware.validateSlackRequest)
 
 app.post("/message", async (request, response, next) => {
-    routes.message(request.body)
-    response.send('ok')
+    const responseBody = await routes.message(request.body)
+    response.send(responseBody)
 })
 
 app.get("/auth", async (request, response, next) => {

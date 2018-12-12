@@ -7,8 +7,8 @@ const generateBody = async ({ user_id, user_name, text }) => {
             {
                 fields: [
                     {
-                        title: "Message Received!",
-                        value: "Thank you!"
+                        title: "Strangerer Things have happend!",
+                        value: `<@${user_id}>, thanks for your message! It'll display shortly.`
                     }
                 ]
             }
