@@ -9,6 +9,8 @@ import time
 # COLORS & BRIGHTNESSES
 RED = (255,0,0)
 GREEN = (0,255,0)
+BLUE = (0,0,255)
+YELLOW =(255,255,0)
 WHITE = ON = (255,255,255)
 OFF = (0,0,0)
 PS_ORANGE = (249, 104, 22)
@@ -22,9 +24,12 @@ CHRISTMAS_COLORS = [WHITE, GREEN, RED]
 PS_THEME = "PS_THEME"
 PS_COLORS = [PS_ORANGE, PS_PINK]
 
+CHS_THEME = "CHS_THEME"
+CHS_COLORS = [RED, BLUE, YELLOW, GREEN]
+
 RANDOM_THEME = "RANDOM_THEME"
 
-SELECTED_THEME = CHRISTMAS_THEME
+SELECTED_THEME = CHS_THEME
 
 # TIMING (ALL IN SECONDS) & LOOPING 
 TIMES_TO_DISPLAY_MESSAGE = 3
@@ -60,10 +65,13 @@ def get_pixel_color(index=None):
     color = None
     if SELECTED_THEME == CHRISTMAS_THEME:
         print(index % len(CHRISTMAS_COLORS))
-        color = CHRISTMAS_COLORS[index % len(CHRISTMAS_COLORS)]
+        color = CHRISTMAS_COLORS[random.randint(0,len(CHRISTMAS_COLORS) - 1)]
         
     elif SELECTED_THEME == PS_THEME:
-        color = PS_COLORS[index % len(PS_COLORS)]
+        color = PS_COLORS[random.randint(0,len(PS_COLORS) - 1)]
+        
+    elif SELECTED_THEME == CHS_THEME:
+        color = CHS_COLORS[random.randint(0,len(CHS_COLORS) - 1)]
         
     elif SELECTED_THEME == RANDOM_THEME:
         r = random.randint(0,255)
