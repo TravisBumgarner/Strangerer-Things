@@ -42,7 +42,7 @@ PAUSE_LETTER_ON = 0.75
 PAUSE_LETTER_OFF = PAUSE_LETTER_ON / 4
 
 # HARDWARE CONFIG
-ADDRESSABLE_LEDS = 50
+ADDRESSABLE_LEDS = 26
 
 # ORDS
 A = ord('a')
@@ -196,6 +196,7 @@ def main():
             for message in messages:
                 parsed_message = json.loads(message.body)
                 sanitized_message = sanitize_message(parsed_message["content"])
+                print('Incoming message: ' + sanitized_message)
                 theme = parsed_message["colors"]
                 message_incoming_mode()
                 for _ in range(TIMES_TO_DISPLAY_MESSAGE):
