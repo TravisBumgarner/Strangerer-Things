@@ -3,6 +3,9 @@ import neopixel
 import random
 import time
 
+import boto3
+
+from config import region_name, aws_access_key_id, aws_secret_access_key, queue_name
 
 ###### CONSTANTS HERE #####
 
@@ -29,7 +32,7 @@ CHS_COLORS = [RED, BLUE, YELLOW, GREEN]
 
 RANDOM_THEME = "RANDOM_THEME"
 
-SELECTED_THEME = CHS_THEME
+SELECTED_THEME = CHRISTMAS_THEME
 
 # TIMING (ALL IN SECONDS) & LOOPING 
 TIMES_TO_DISPLAY_MESSAGE = 3
@@ -49,7 +52,8 @@ SPACE = ord(' ')
 ###### /CONSTANTS HERE #####
 
 pixels = neopixel.NeoPixel(board.D12, ADDRESSABLE_LEDS, pixel_order=neopixel.RGB) 
-
+sqs = boto3.resource('sqs', region_name=region_name, aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+queue = sqs.get_queue_by_name(QueueName=queue_name)
 
 def sanitize_message(text):
     sanitized_text = ''
@@ -156,23 +160,22 @@ def prompt_user_input():
 def main():
     message = None
     while True:
+        messages = queue.receive_messages()
+        if messages:
+            for message in messages:
+                print(message.body)
                 
-        if message:
-            all_off()
-            sanitized_message = sanitize_message(message)
-            for _ in range(TIMES_TO_DISPLAY_MESSAGE):
-                render_message(sanitized_message)
-                time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
-            message = None
-        
+                sanitized_message = sanitize_message(message.body)
+                for _ in range(TIMES_TO_DISPLAY_MESSAGE):
+                    all_off()
+                    time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
+                    render_message(sanitized_message)
+                    time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
+                
+                message.delete()
+            
         else:
-            try:
-                while True:
-                    idle_mode()
-            except KeyboardInterrupt:
-                message = prompt_user_input()
-                print('erroring...')
-                continue
+            idle_mode()
 
 
 if __name__ == "__main__":
