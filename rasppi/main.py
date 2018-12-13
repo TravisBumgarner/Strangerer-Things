@@ -2,6 +2,7 @@ import board
 import neopixel
 import random
 import time
+import json
 
 import boto3
 
@@ -32,7 +33,7 @@ CHS_COLORS = [RED, BLUE, YELLOW, GREEN]
 
 RANDOM_THEME = "RANDOM_THEME"
 
-SELECTED_THEME = CHRISTMAS_THEME
+SELECTED_THEME = PS_THEME
 
 # TIMING (ALL IN SECONDS) & LOOPING 
 TIMES_TO_DISPLAY_MESSAGE = 3
@@ -183,8 +184,11 @@ def main():
     while True:
         messages = queue.receive_messages()
         if messages:
-            for message in messages:   
-                sanitized_message = sanitize_message(message.body)
+            for message in messages:
+                parsed_message = json.loads(message.body)
+                sanitized_message = sanitize_message(parsed_message["content"])
+                theme = parsed_message["colors"]
+                print(theme)
                 for _ in range(TIMES_TO_DISPLAY_MESSAGE):
                     all_off()
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
