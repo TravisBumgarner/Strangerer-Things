@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
         table.text("user_id")
         table.text("user_name")
         table.text("colors")
-        table.text("message")
+        table.text("content")
         table.timestamp("created_at").defaultTo(knex.fn.now())
     })
 }

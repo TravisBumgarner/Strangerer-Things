@@ -1,3 +1,4 @@
 import create from "./create"
+import getRecentUsers from "./getRecentUsers"
 
-export default { create }
+export default { create, getRecentUsers }

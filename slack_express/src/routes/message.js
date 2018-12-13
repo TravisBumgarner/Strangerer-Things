@@ -1,7 +1,7 @@
 import { message } from "../db"
 
-const generateBody = async ({ user_id, user_name, text }) => {
-    const result = await message.create({ user_id, user_name, text })
+const generateBody = async ({content, colors, user_id, user_name}) => {
+    const result = await message.create({content, colors, user_id, user_name})
     return {
         attachments: [
             {

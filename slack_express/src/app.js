@@ -4,6 +4,7 @@ import bodyParser from "body-parser"
 import AWS from  "aws-sdk"
 import * as middleware from "./middleware"
 import * as routes from "./routes"
+import {message} from "./db"
 import config from "./config"
 import qs from 'querystring'
 
@@ -69,10 +70,21 @@ app.post("/dialog", async (request, response, next) => {
 
 app.post("/form_submission", async (request, response, next) => {
     const data = JSON.parse(request.body.payload)
-    const {submission:{message, colors}, user:{id, name} } = data 
-    console.log(message,colors, id, name)
-    if(message.length > ALLOWABLE_MESSAGE_LENGTH){
-        response.json({
+    const {submission:{message: content, colors}, user:{id, name} } = data 
+    // const recentUsers = await message.getRecentUsers()
+    // if(recentUsers.includes(id)){
+    //     return response.json({
+    //         "errors": [
+    //           {
+    //             "name": "message",
+    //             "error": "Slow down there cowboy, others are trying to escape the upside down."
+    //           },
+    //         ]
+    //       })   
+    // }
+
+    if(content.length > ALLOWABLE_MESSAGE_LENGTH){
+        return response.json({
             "errors": [
               {
                 "name": "message",
@@ -81,15 +93,16 @@ app.post("/form_submission", async (request, response, next) => {
             ]
           })
     }
-
-    // const responseBody = await routes.message({message, colors, id, name})  
+    const responseBody = await routes.message({ user_id: id, user_name: name, colors, content })  
     // Slack API doesn't seem to care about messages in the next line
-    const result = await queue_sqs(message)
+    const result = await queue_sqs(content)
     console.log('result', result)
     response.send('')
 })
 
-app.get("/ok", (request, response, next) => response.send("Service is running"))
+app.get("/ok", (request, response, next) => {
+    response.send("Service is running")
+})
 
 const queue_sqs = (message) => {
     const params = {
