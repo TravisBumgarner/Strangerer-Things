@@ -89,7 +89,7 @@ def sanitize_message(text):
     sanitized_text = ''
     
     for letter in text.lower():
-        if ord(letter) >= A or ord(letter) <= Z or ord(letter) == SPACE:
+        if (ord(letter) >= A and ord(letter) <= Z) or ord(letter) == SPACE:
             sanitized_text += letter     
     return sanitized_text
 
@@ -201,7 +201,7 @@ if __name__ == "__main__":
         main()
     
     except Exception as e:
-        print(e)
+        print('exception', e)
         error_mode()
     
     finally:
