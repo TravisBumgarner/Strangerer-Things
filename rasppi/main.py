@@ -3,6 +3,7 @@ import neopixel
 import random
 import time
 import json
+import collections
 
 import boto3
 
@@ -34,11 +35,11 @@ RGBY_COLORS = [RED, BLUE, YELLOW, GREEN]
 RANDOM_THEME = "RANDOM_THEME"
 
 # TIMING (ALL IN SECONDS) & LOOPING 
-TIMES_TO_DISPLAY_MESSAGE = 3
-PAUSE_BETWEEN_MESSAGE_REPEATS = 0.5
-PAUSE_BETWEEN_WORDS = 1
-PAUSE_LETTER_ON = 0.25
-PAUSE_LETTER_OFF = PAUSE_LETTER_ON / 2
+TIMES_TO_DISPLAY_MESSAGE = 2
+PAUSE_BETWEEN_MESSAGE_REPEATS = 1.5
+PAUSE_BETWEEN_WORDS = 0.75
+PAUSE_LETTER_ON = 0.30
+PAUSE_LETTER_OFF = PAUSE_LETTER_ON / 4
 
 # HARDWARE CONFIG
 ADDRESSABLE_LEDS = 50
@@ -48,34 +49,34 @@ A = ord('a')
 Z = ord('z')
 SPACE = ord(' ')
 
-alphabet_to_led = {
-"a": 0,
-"b": 1,
-"c": 2,
-"d": 3,
-"e": 4,
-"f": 5,
-"g": 6,
-"h": 7,
-"i": 8,
-"j": 16,
-"k": 15,
-"l": 14,
-"m": 13,
-"n": 12,
-"o": 11,
-"p": 10,
-"q": 9,
-"r": 17,
-"s": 18,
-"t": 19,
-"u": 20,
-"v": 21,
-"w": 22,
-"x": 23,
-"y": 24,
-"z": 25   
-}
+alphabet_to_led = collections.OrderedDict()
+alphabet_to_led["a"] = 0
+alphabet_to_led["b"] = 1
+alphabet_to_led["c"] = 2
+alphabet_to_led["d"] = 3
+alphabet_to_led["e"] = 4
+alphabet_to_led["f"] = 5
+alphabet_to_led["g"] = 6
+alphabet_to_led["h"] = 7
+alphabet_to_led["i"] = 8
+alphabet_to_led["j"] = 16
+alphabet_to_led["k"] = 15
+alphabet_to_led["l"] = 14
+alphabet_to_led["m"] = 13
+alphabet_to_led["n"] = 12
+alphabet_to_led["o"] = 11
+alphabet_to_led["p"] = 10
+alphabet_to_led["q"] = 9
+alphabet_to_led["r"] = 17
+alphabet_to_led["s"] = 18
+alphabet_to_led["t"] = 19
+alphabet_to_led["u"] = 20
+alphabet_to_led["v"] = 21
+alphabet_to_led["w"] = 22
+alphabet_to_led["x"] = 23
+alphabet_to_led["y"] = 24
+alphabet_to_led["z"] = 25 
+
 
 
 ###### /CONSTANTS HERE #####
@@ -93,21 +94,15 @@ def sanitize_message(text):
     return sanitized_text
 
 
-def get_pixel_color(index=None, theme=CHRISTMAS_THEME):
-    print('theme', theme)
-    
+def get_pixel_color(index=None, theme=CHRISTMAS_THEME):   
     color = None
     if theme == CHRISTMAS_THEME:
-        print(len(CHRISTMAS_COLORS), "christmas colors")
-        print('christmas happens')
         color = CHRISTMAS_COLORS[random.randint(0,len(CHRISTMAS_COLORS) - 1)]
         
     elif theme == PS_THEME:
-        print('ps happens')
         color = PS_COLORS[random.randint(0,len(PS_COLORS) - 1)]
         
     elif theme == RGBY_THEME:
-        print('rgby happens')
         color = RGBY_COLORS[random.randint(0,len(RGBY_COLORS) - 1)]
         
     elif theme == RANDOM_THEME:
@@ -130,7 +125,6 @@ def render_word(word, theme):
       
     for letter_index, letter in enumerate(word):
         index = alphabet_to_led[letter]
-        print('index', index)
         pixels[index] = get_pixel_color(letter_index, theme) 
         time.sleep(PAUSE_LETTER_ON)
         pixels[index] = OFF
@@ -139,9 +133,7 @@ def render_word(word, theme):
 
 def render_message(text, theme):
     words = text.split(' ')
-    print(words, 'words')
     word_count = len(words)
-    
     for word in words:
         render_word(word, theme)
         if word_count > 1:
@@ -177,9 +169,16 @@ def idle_mode():
     lights = [random.randint(0,4) for i in range(ADDRESSABLE_LEDS)]
     indices = sorted([i for i in range(ADDRESSABLE_LEDS)], key=lambda *args: random.random())
     for i in indices:
-        r,b,g = get_pixel_color(i, CHRISTMAS_THEME)
+        r,b,g = get_pixel_color(i, RANDOM_THEME)
         pixels[i] = (int(r  * lights[i] / 4), int(b * lights[i] / 4), int(g * lights[i] / 4))
 
+
+def message_incoming_mode():
+    all_off()
+    for i in alphabet_to_led.values():
+        pixels[i] = get_pixel_color(i, RANDOM_THEME)
+        time.sleep(0.15)
+    all_off()
 
 def error_mode():
     for i in range(3):
@@ -198,6 +197,7 @@ def main():
                 parsed_message = json.loads(message.body)
                 sanitized_message = sanitize_message(parsed_message["content"])
                 theme = parsed_message["colors"]
+                message_incoming_mode()
                 for _ in range(TIMES_TO_DISPLAY_MESSAGE):
                     all_off()
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
