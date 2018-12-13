@@ -49,6 +49,36 @@ A = ord('a')
 Z = ord('z')
 SPACE = ord(' ')
 
+alphabet_to_led = {
+"a": 0,
+"b": 1,
+"c": 2,
+"d": 3,
+"e": 4,
+"f": 5,
+"g": 6,
+"h": 7,
+"i": 8,
+"j": 16,
+"k": 15,
+"l": 14,
+"m": 13,
+"n": 12,
+"o": 11,
+"p": 10,
+"q": 9,
+"r": 17,
+"s": 18,
+"t": 19,
+"u": 20,
+"v": 21,
+"w": 22,
+"x": 23,
+"y": 24,
+"z": 25   
+}
+
+
 ###### /CONSTANTS HERE #####
 
 pixels = neopixel.NeoPixel(board.D12, ADDRESSABLE_LEDS, pixel_order=neopixel.RGB) 
@@ -90,7 +120,7 @@ def render_word(word):
     letter_offset = ord('a')
       
     for letter_index, letter in enumerate(word):
-        index = ord(letter) - letter_offset
+        index = alphabet_to_led[letter]
         pixels[index] = get_pixel_color(letter_index) 
         time.sleep(PAUSE_LETTER_ON)
         pixels[index] = OFF
@@ -105,7 +135,6 @@ def render_message(text):
         render_word(word)
         if word_count > 1:
             time.sleep(PAUSE_BETWEEN_WORDS)
-            
         
 def all_off():
     for led in range(ADDRESSABLE_LEDS):
@@ -149,29 +178,18 @@ def error_mode():
         time.sleep(0.25)    
 
 
-def prompt_user_input():
-    try:
-        return input('Enter a message to display:\n')
-    except Exception as e:
-        print(e)
-        return None
-
-
 def main():
     message = None
     while True:
         messages = queue.receive_messages()
         if messages:
-            for message in messages:
-                print(message.body)
-                
+            for message in messages:   
                 sanitized_message = sanitize_message(message.body)
                 for _ in range(TIMES_TO_DISPLAY_MESSAGE):
                     all_off()
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
                     render_message(sanitized_message)
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
-                
                 message.delete()
             
         else:
