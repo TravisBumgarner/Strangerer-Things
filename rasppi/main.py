@@ -22,18 +22,16 @@ PS_PINK = (232,10,137)
 
 
 # Themes
-CHRISTMAS_THEME = "CHRISTMAS_MODE"
+CHRISTMAS_THEME = "CHRISTMAS_THEME"
 CHRISTMAS_COLORS = [WHITE, GREEN, RED]
 
 PS_THEME = "PS_THEME"
 PS_COLORS = [PS_ORANGE, PS_PINK]
 
-CHS_THEME = "CHS_THEME"
-CHS_COLORS = [RED, BLUE, YELLOW, GREEN]
+RGBY_THEME = "RGBY_THEME"
+RGBY_COLORS = [RED, BLUE, YELLOW, GREEN]
 
 RANDOM_THEME = "RANDOM_THEME"
-
-SELECTED_THEME = PS_THEME
 
 # TIMING (ALL IN SECONDS) & LOOPING 
 TIMES_TO_DISPLAY_MESSAGE = 3
@@ -95,45 +93,57 @@ def sanitize_message(text):
     return sanitized_text
 
 
-def get_pixel_color(index=None):
-    # index % len(possible_them_colors) gives us the index to pick
+def get_pixel_color(index=None, theme=CHRISTMAS_THEME):
+    print('theme', theme)
+    
     color = None
-    if SELECTED_THEME == CHRISTMAS_THEME:
-        print(index % len(CHRISTMAS_COLORS))
+    if theme == CHRISTMAS_THEME:
+        print(len(CHRISTMAS_COLORS), "christmas colors")
+        print('christmas happens')
         color = CHRISTMAS_COLORS[random.randint(0,len(CHRISTMAS_COLORS) - 1)]
         
-    elif SELECTED_THEME == PS_THEME:
+    elif theme == PS_THEME:
+        print('ps happens')
         color = PS_COLORS[random.randint(0,len(PS_COLORS) - 1)]
         
-    elif SELECTED_THEME == CHS_THEME:
-        color = CHS_COLORS[random.randint(0,len(CHS_COLORS) - 1)]
+    elif theme == RGBY_THEME:
+        print('rgby happens')
+        color = RGBY_COLORS[random.randint(0,len(RGBY_COLORS) - 1)]
         
-    elif SELECTED_THEME == RANDOM_THEME:
+    elif theme == RANDOM_THEME:
         r = random.randint(0,255)
         b = random.randint(0,255)
         g = random.randint(0,255)
         color = (r,g,b)
-    print(color)
+        
+    else:
+        r = random.randint(0,255)
+        b = random.randint(0,255)
+        g = random.randint(0,255)
+        color = (r,g,b)
+        
     return color
 
 
-def render_word(word):
+def render_word(word, theme):
     letter_offset = ord('a')
       
     for letter_index, letter in enumerate(word):
         index = alphabet_to_led[letter]
-        pixels[index] = get_pixel_color(letter_index) 
+        print('index', index)
+        pixels[index] = get_pixel_color(letter_index, theme) 
         time.sleep(PAUSE_LETTER_ON)
         pixels[index] = OFF
         time.sleep(PAUSE_LETTER_OFF)
 
 
-def render_message(text):
+def render_message(text, theme):
     words = text.split(' ')
+    print(words, 'words')
     word_count = len(words)
     
     for word in words:
-        render_word(word)
+        render_word(word, theme)
         if word_count > 1:
             time.sleep(PAUSE_BETWEEN_WORDS)
         
@@ -167,7 +177,7 @@ def idle_mode():
     lights = [random.randint(0,4) for i in range(ADDRESSABLE_LEDS)]
     indices = sorted([i for i in range(ADDRESSABLE_LEDS)], key=lambda *args: random.random())
     for i in indices:
-        r,b,g = get_pixel_color(i)
+        r,b,g = get_pixel_color(i, CHRISTMAS_THEME)
         pixels[i] = (int(r  * lights[i] / 4), int(b * lights[i] / 4), int(g * lights[i] / 4))
 
 
@@ -188,11 +198,10 @@ def main():
                 parsed_message = json.loads(message.body)
                 sanitized_message = sanitize_message(parsed_message["content"])
                 theme = parsed_message["colors"]
-                print(theme)
                 for _ in range(TIMES_TO_DISPLAY_MESSAGE):
                     all_off()
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
-                    render_message(sanitized_message)
+                    render_message(sanitized_message, theme)
                     time.sleep(PAUSE_BETWEEN_MESSAGE_REPEATS)
                 message.delete()
             
