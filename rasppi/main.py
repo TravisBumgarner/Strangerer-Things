@@ -38,7 +38,7 @@ RANDOM_THEME = "RANDOM_THEME"
 TIMES_TO_DISPLAY_MESSAGE = 2
 PAUSE_BETWEEN_MESSAGE_REPEATS = 1.5
 PAUSE_BETWEEN_WORDS = 0.75
-PAUSE_LETTER_ON = 0.30
+PAUSE_LETTER_ON = 0.75
 PAUSE_LETTER_OFF = PAUSE_LETTER_ON / 4
 
 # HARDWARE CONFIG
@@ -157,9 +157,9 @@ def adjust_brightness(rgb, brightness=1):
 
     r,g,b = rgb
     
-    modified_r = int(r * brightness / 255)
-    modified_g = int(g * brightness / 255)
-    modified_b = int(b * brightness / 255)
+    modified_r = int(r * brightness)
+    modified_g = int(g * brightness)
+    modified_b = int(b * brightness)
     
     return (modified_r, modified_g, modified_b)
 
