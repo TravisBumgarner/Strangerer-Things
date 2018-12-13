@@ -41,7 +41,7 @@ app.post("/dialog", async (request, response, next) => {
         dialog: JSON.stringify({
           callback_id: "will_said_something",
           "title": "What's up, Will?",
-          "submit_label": "Request",
+          "submit_label": "Mommmmm!",
           "notify_on_cancel": true,
           "state": "Limo",
           "elements": [
@@ -51,9 +51,27 @@ app.post("/dialog", async (request, response, next) => {
                   "name": "message"
               },
               {
-                "type": "text",
+                "type": "select",
                 "label": "Feeling stylish?",
-                "name": "colors"
+                "name": "colors",
+                "options": [
+                    {
+                        label: "Christmas Colors",
+                        value: "CHRISTMAS_THEME"
+                    },
+                    {
+                        label: "PS Colors",
+                        value: "PS_THEME"
+                    },
+                    {
+                        label: "Random Colors",
+                        value: "RANDOM_THEME"
+                    },
+                    {
+                        label: "RGBY Colors",
+                        value: "CHS_THEME"
+                    }
+                ]
             }
           ]
         })
@@ -95,9 +113,25 @@ app.post("/form_submission", async (request, response, next) => {
     }
     const responseBody = await routes.message({ user_id: id, user_name: name, colors, content })  
     // Slack API doesn't seem to care about messages in the next line
-    const result = await queue_sqs(content)
-    console.log('result', result)
-    response.send('')
+    const sqs_message = {
+        content,
+        colors
+    }
+    const result = await queue_sqs(sqs_message)
+    console.log('result', id)
+    console.log('token', config.slack.oauth_token)
+    axios.post(`${SLACK_URL}/chat.postMessage`, {
+        token: config.slack.oauth_token,
+        channel: id,
+        text: `Good luck <@${id}>, I hope it's not too late.`
+      })
+      .then((result) => {
+        console.log(result.data)
+        response.send('')
+      }).catch((err) => {
+        console.log(err)
+        response.sendStatus(500);
+      });
 })
 
 app.get("/ok", (request, response, next) => {
@@ -106,7 +140,7 @@ app.get("/ok", (request, response, next) => {
 
 const queue_sqs = (message) => {
     const params = {
-        MessageBody: message,
+        MessageBody: JSON.stringify(message),
         QueueUrl: config.sqs.url
     }
     sqs.sendMessage(params, (error, data) => { 
