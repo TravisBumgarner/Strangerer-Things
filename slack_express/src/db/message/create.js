@@ -1,7 +1,7 @@
 import knex from "../knex"
 
-const create = ({ user_id, user_name, text }) => {
-    return knex("message").insert({ user_id, user_name, text })
+const create = ({ id, name, color, message }) => {
+    return knex("message").insert({ id, name, color, message })
 }
 
 export default create
