@@ -27,11 +27,6 @@ app.use(bodyParser.json())
 
 app.use(middleware.validateSlackRequest)
 
-// app.post("/message", async (request, response, next) => {
-//     const responseBody = await routes.message(request.body)
-//     response.send(responseBody)
-// })
-
 app.post("/dialog", async (request, response, next) => {
     const { trigger_id } = request.body
 
